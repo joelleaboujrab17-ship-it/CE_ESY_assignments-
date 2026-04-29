@@ -2,18 +2,18 @@
 #include <string.h>
 #include <stdbool.h>
 
-// 1. تحديد حجم المخزن (يمكنك تغييره لاختبار حالات الامتلاء والفراغ)
+// 1. تحديد حجم المخزن (SIZE)
 #define SIZE 15
 
-// 2. تعريف هيكل المخزن الدائري 
+// 2. تعريف هيكل المخزن الدائري
 typedef struct {
     char buffer[SIZE];
     int head;  // مؤشر الكتابة
-    int tail;  // مؤشر القراءة 
-    int count; // عدد العناصر الحالية 
+    int tail;  // مؤشر القراءة
+    int count; // عدد العناصر الحالية
 } CircularBuffer;
 
-// تهيئة المخزن 
+// تهيئة المخزن
 void init(CircularBuffer *cb) {
     cb->head = 0;
     cb->tail = 0;
@@ -25,63 +25,57 @@ bool isFull(CircularBuffer *cb) {
     return cb->count == SIZE;
 }
 
-// التحقق هل المخزن فارغ 
+// التحقق هل المخزن فارغ
 bool isEmpty(CircularBuffer *cb) {
     return cb->count == 0;
 }
 
-// دالة الكتابة في المخزن 
+// دالة الكتابة في المخزن
 void write(CircularBuffer *cb, char data) {
     if (isFull(cb)) {
-        printf("\n[خطأ] المخزن ممتلئ (Overflow)! لا يمكن إضافة: %c\n", data); [cite: 17, 66]
+        printf("\n[خطأ] المخزن ممتلئ (Overflow)! لا يمكن إضافة: %c\n", data);
         return;
     }
     cb->buffer[cb->head] = data;
-    cb->head = (cb->head + 1) % SIZE; // التحرك بشكل دائري
+    cb->head = (cb->head + 1) % SIZE;
     cb->count++;
 }
 
-// دالة القراءة من المخزن 
+// دالة القراءة من المخزن
 char read(CircularBuffer *cb) {
     if (isEmpty(cb)) {
-        printf("\n[خطأ] المخزن فارغ (Underflow)!\n"); [cite: 17, 71]
+        printf("\n[خطأ] المخزن فارغ (Underflow)!\n");
         return '\0';
     }
     char data = cb->buffer[cb->tail];
-    cb->tail = (cb->tail + 1) % SIZE; // التحرك بشكل دائري
+    cb->tail = (cb->tail + 1) % SIZE;
     cb->count--;
     return data;
 }
 
 int main() {
     CircularBuffer cb;
-    init(&cb); // تهيئة المخزن [cite: 78]
+    init(&cb);
 
-    char name[100];
+    char name[50];
     printf("أدخل اسمك: ");
-    scanf("%s", name); // إدخال الاسم [cite: 20, 80]
+    scanf("%s", name);
 
-    // إضافة اللاحقة المطلوبة [cite: 20, 83]
+    // إضافة اللاحقة المطلوبة
     strcat(name, "CE-ESY");
-    printf("الناتج بعد الإضافة: %s\n", name);
+    printf("الناتج بعد التعديل: %s\n", name);
 
-    // تخزين الناتج في المخزن الدائري 
-    printf("جاري الكتابة في المخزن...\n");
+    // تخزين كل حرف في المخزن
     for (int i = 0; i < strlen(name); i++) {
-        write(&cb, name[i]); [cite: 86]
+        write(&cb, name[i]);
     }
 
-    // قراءة البيانات وعرضها 
+    // قراءة البيانات من المخزن وعرضها
     printf("البيانات المستخرجة من المخزن: ");
     while (!isEmpty(&cb)) {
-        printf("%c", read(&cb)); [cite: 90, 91]
+        printf("%c", read(&cb));
     }
     printf("\n");
-
-    // التأكد من أن المخزن فارغ 
-    if (isEmpty(&cb)) {
-        printf("تم التحقق: المخزن الآن فارغ تماماً.\n");
-    }
 
     return 0;
 }
