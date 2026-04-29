@@ -2,80 +2,70 @@
 #include <string.h>
 #include <stdbool.h>
 
-// 1. تحديد حجم المخزن (SIZE)
-#define SIZE 15
+#define MAX_CAPACITY 18
 
-// 2. تعريف هيكل المخزن الدائري
 typedef struct {
-    char buffer[SIZE];
-    int head;  // مؤشر الكتابة
-    int tail;  // مؤشر القراءة
-    int count; // عدد العناصر الحالية
-} CircularBuffer;
+    char data_storage[MAX_CAPACITY];
+    int write_pos;
+    int read_pos;
+    int current_size;
+} MyCircularBuffer;
 
-// تهيئة المخزن
-void init(CircularBuffer *cb) {
-    cb->head = 0;
-    cb->tail = 0;
-    cb->count = 0;
+void setupBuffer(MyCircularBuffer *cb) {
+    cb->write_pos = 0;
+    cb->read_pos = 0;
+    cb->current_size = 0;
 }
 
-// التحقق هل المخزن ممتلئ
-bool isFull(CircularBuffer *cb) {
-    return cb->count == SIZE;
+bool checkFull(MyCircularBuffer *cb) {
+    return cb->current_size == MAX_CAPACITY;
 }
 
-// التحقق هل المخزن فارغ
-bool isEmpty(CircularBuffer *cb) {
-    return cb->count == 0;
+bool checkEmpty(MyCircularBuffer *cb) {
+    return cb->current_size == 0;
 }
 
-// دالة الكتابة في المخزن
-void write(CircularBuffer *cb, char data) {
-    if (isFull(cb)) {
-        printf("\n[خطأ] المخزن ممتلئ (Overflow)! لا يمكن إضافة: %c\n", data);
+void insertData(MyCircularBuffer *cb, char item) {
+    if (checkFull(cb)) {
+        printf("\n[Overflow] %c\n", item);
         return;
     }
-    cb->buffer[cb->head] = data;
-    cb->head = (cb->head + 1) % SIZE;
-    cb->count++;
+    cb->data_storage[cb->write_pos] = item;
+    cb->write_pos = (cb->write_pos + 1) % MAX_CAPACITY;
+    cb->current_size++;
 }
 
-// دالة القراءة من المخزن
-char read(CircularBuffer *cb) {
-    if (isEmpty(cb)) {
-        printf("\n[خطأ] المخزن فارغ (Underflow)!\n");
+char extractData(MyCircularBuffer *cb) {
+    if (checkEmpty(cb)) {
+        printf("\n[Underflow]\n");
         return '\0';
     }
-    char data = cb->buffer[cb->tail];
-    cb->tail = (cb->tail + 1) % SIZE;
-    cb->count--;
-    return data;
+    char item = cb->data_storage[cb->read_pos];
+    cb->read_pos = (cb->read_pos + 1) % MAX_CAPACITY;
+    cb->current_size--;
+    return item;
 }
 
 int main() {
-    CircularBuffer cb;
-    init(&cb);
+    MyCircularBuffer my_cb;
+    setupBuffer(&my_cb);
 
-    char name[50];
-    printf("أدخل اسمك: ");
-    scanf("%s", name);
+    char user_name[60];
+    printf("Enter name: ");
+    scanf("%s", user_name);
 
-    // إضافة اللاحقة المطلوبة
-    strcat(name, "CE-ESY");
-    printf("الناتج بعد التعديل: %s\n", name);
-
-    // تخزين كل حرف في المخزن
-    for (int i = 0; i < strlen(name); i++) {
-        write(&cb, name[i]);
+    strcat(user_name, "CE-ESY");
+    
+    for (int i = 0; i < strlen(user_name); i++) {
+        insertData(&my_cb, user_name[i]);
     }
 
-    // قراءة البيانات من المخزن وعرضها
-    printf("البيانات المستخرجة من المخزن: ");
-    while (!isEmpty(&cb)) {
-        printf("%c", read(&cb));
+    printf("Buffer Output: ");
+    while (!checkEmpty(&my_cb)) {
+        printf("%c", extractData(&my_cb));
     }
     printf("\n");
 
     return 0;
 }
+
